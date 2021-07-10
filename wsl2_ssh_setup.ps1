@@ -1,3 +1,5 @@
+# Based on WSL2 network port forwarding script v1 by Daehyuk Ahn
+
 # Display all portproxy information
 If ($Args[0] -eq "list") {
     netsh interface portproxy show v4tov4;
