@@ -1,30 +1,4 @@
-# Try to running with full privileges
-param([switch]$Elevated)
-
-function Test-Admin {
-  $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
-  $currentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
-}
-
-if ((Test-Admin) -eq $false)  {
-    if ($elevated) 
-    {
-        # tried to elevate, did not work, aborting
-    } 
-    else {
-        Start-Process powershell.exe -Verb RunAs -ArgumentList ('-noprofile -noexit -file "{0}" -elevated' -f ($myinvocation.MyCommand.Definition))
-}
-
-exit
-}
-echo 'running with full privileges'
-
-# WSL2 network port forwarding script v1
-#   for enable script, 'Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser' in Powershell,
-#   for delete exist rules and ports use 'delete' as parameter, for show ports use 'list' as parameter.
-#   written by Daehyuk Ahn, Aug-1-2020
-
-# Start sshd in wsl2
+# Start sshd in WSL
 ubuntu2004.exe -c "sudo service ssh start"
 
 # Display all portproxy information
@@ -41,14 +15,14 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
   exit
 }
 
-# You should modify '$Ports' for your applications 
-$Ports = (2222,80,443,8080)
+# Need to set sshd port to 2222 in WSL
+$Ports = (2222)
 
 # Check WSL ip address
-wsl hostname -I | Set-Variable -Name "WSL"
+(wsl hostname -I).split(" ")[0] | Set-Variable -Name "WSL"
 $found = $WSL -match '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}';
 if (-not $found) {
-  echo "WSL2 cannot be found. Terminate script.";
+  Write-Output "WSL2 cannot be found. Terminate script.";
   exit;
 }
 
@@ -62,9 +36,9 @@ if ($Args[0] -ne "delete") {
 # Add each port into portproxy
 $Addr = "0.0.0.0"
 Foreach ($Port in $Ports) {
-    iex "netsh interface portproxy delete v4tov4 listenaddress=$Addr listenport=$Port | Out-Null";
+    Invoke-Expression "netsh interface portproxy delete v4tov4 listenaddress=$Addr listenport=$Port | Out-Null";
     if ($Args[0] -ne "delete") {
-        iex "netsh interface portproxy add v4tov4 listenaddress=$Addr listenport=$Port connectaddress=$WSL connectport=$Port | Out-Null";
+        Invoke-Expression "netsh interface portproxy add v4tov4 listenaddress=$Addr listenport=$Port connectaddress=$WSL connectport=$Port | Out-Null";
     }
 }
 
