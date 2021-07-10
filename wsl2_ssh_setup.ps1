@@ -1,11 +1,11 @@
-# Start sshd in WSL
-ubuntu2004.exe -c "sudo service ssh start"
-
 # Display all portproxy information
 If ($Args[0] -eq "list") {
     netsh interface portproxy show v4tov4;
     exit;
 } 
+
+# Start sshd in WSL
+ubuntu2004.exe -c "sudo service ssh start"
 
 # If elevation needed, start new process
 If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
