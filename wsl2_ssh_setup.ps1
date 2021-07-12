@@ -6,9 +6,6 @@ If ($Args[0] -eq "list") {
     exit;
 } 
 
-# Start sshd in WSL
-ubuntu2004.exe -c "sudo service ssh start"
-
 # If elevation needed, start new process
 If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
@@ -18,7 +15,10 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 }
 
 # Need to set sshd port to 2222 in WSL
-$Ports = (2222)
+$Ports = (2222, 8080)
+
+# Start sshd in WSL
+ubuntu2004.exe -c "sudo service ssh start"
 
 # Check WSL ip address
 (wsl hostname -I).split(" ")[0] | Set-Variable -Name "WSL"
