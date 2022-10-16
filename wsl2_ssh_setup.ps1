@@ -18,7 +18,7 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 $Ports = (2222, 8080)
 
 # Start sshd in WSL
-ubuntu2004.exe -c "sudo service ssh start"
+ubuntu.exe -c "sudo service ssh start"
 
 # Check WSL ip address
 (wsl hostname -I).split(" ")[0] | Set-Variable -Name "WSL"
